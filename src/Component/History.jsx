@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { db } from "../firebase";
 import { useEffect } from "react";
-import {
-    getDocs,
-    collection,
-    deleteDoc,
-    doc,
-  } from "firebase/firestore";
+import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
+import { Link } from "react-router-dom";
 
 function History() {
   const [userHistory, setUserHistory] = useState([]);
@@ -84,6 +80,12 @@ function History() {
                       scope="col"
                       className="px-12 py-3 text-xs font-bold text-right text-gray-500 uppercase"
                     >
+                      Detail
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-12 py-3 text-xs font-bold text-right text-gray-500 uppercase"
+                    >
                       Action
                     </th>
                   </tr>
@@ -105,6 +107,20 @@ function History() {
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
                         {value.balik}
+                      </td>
+                      <td className="px- py-4 text-sm font-medium text-right whitespace-nowrap">
+                        <button
+                          className="bg-pink-500 text-white active:bg-blue-500 
+      font-bold px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
+                          type="button"
+                        >
+                          <Link
+                            to="/detail"
+                            className="flex-1 ml-2 whitespace-nowrap"
+                          >
+                            List Item
+                          </Link>
+                        </button>
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                         <button
