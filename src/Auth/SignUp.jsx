@@ -17,6 +17,7 @@ const Register = () => {
   const onSubmit = async (data) => {
     try {
       await createUserWithEmailAndPassword(auth, data.email, data.password);
+
     } catch (err) {
       console.log(err);
     }
@@ -77,6 +78,7 @@ const Register = () => {
                 <button
                   className="w-full mb-5 bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-indigo-600 transition duration-300"
                   type="submit"
+                  onClick={handleSubmit(onSubmit)}
                 >
                   Register
                 </button>
