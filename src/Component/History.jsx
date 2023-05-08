@@ -3,6 +3,7 @@ import { db } from "../firebase";
 import { useEffect } from "react";
 import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
 import { Link } from "react-router-dom";
+import HeaderHistory from "../Header/HeaderHistory";
 
 function History() {
   const [userHistory, setUserHistory] = useState([]);
@@ -40,7 +41,8 @@ function History() {
 
   return (
     <>
-      <div className="flex flex-col">
+    <HeaderHistory/>
+      <div className="flex flex-col ">
         <div className="overflow-x-auto">
           <div className="p-1.5 w-full inline-block align-middle">
             <div className="overflow-hidden border rounded-lg">
