@@ -11,7 +11,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import {getAuth} from "firebase/auth"
+import { getAuth } from "firebase/auth";
 import back from "../Image/back.png";
 import logo from "../Image/logo.png";
 import blm from "../Image/download.png";
@@ -22,6 +22,7 @@ import { Link } from "react-router-dom";
 function User() {
   const [productList, setProductList] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
+  const [filteredList, setFilteredList] = useState(productList);
   const productsCollectionRef = collection(db, "products");
   const cartCollectionRef = collection(db, "cart");
 
@@ -44,8 +45,14 @@ function User() {
 
   const handleOnClick = async (id, name, description, image) => {
     try {
-      await addDoc(cartCollectionRef, { id, name, description, image,userId:getAuth().currentUser.uid});
-      alert("berhasil memasukan produk")
+      await addDoc(cartCollectionRef, {
+        id,
+        name,
+        description,
+        image,
+        userId: getAuth().currentUser.uid,
+      });
+      alert("berhasil memasukan produk");
     } catch (error) {
       console.error(error);
       alert("salah");
@@ -77,10 +84,7 @@ function User() {
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 ">
-          <a
-            href="/"
-            className="flex items-center pl-2.5 mb-5"
-          >
+          <a href="/" className="flex items-center pl-2.5 mb-5">
             <img src={logo} className="h-6 mr-3 sm:h-7" alt="Flowbite Logo" />
             <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
               Walking Garage
@@ -94,7 +98,7 @@ function User() {
                   className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
                   id="exampleSearch"
                   placeholder="Search"
-                  onChange={(event) => setSortOrder(event.target.value)}
+                  onChange={(event) => setFilteredList(event.target.value)}
                 />
               </div>
             </li>
@@ -180,8 +184,13 @@ function User() {
         </div>
         <div>
           <div className="col-10 m-auto">
-            {productList.map((value) => (
-              <div className="float-left d-inline-block m-4">
+            {productList.filter(
+                (value) =>
+                  value.name.toLowerCase().includes(filteredList) ||
+                  value.description.toLowerCase().includes(filteredList) ||
+                  value.status.toLowerCase().includes(filteredList)
+              ).map((value) => (
+              <div key={value.id} className="float-left d-inline-block m-4">
                 <div className="max-w-sm rounded overflow-hidden shadow-lg">
                   <img
                     className="w-60 h-60 object-cover"
@@ -195,9 +204,7 @@ function User() {
                     <p className="text-gray-700 text-base font-bold">
                       {value.description}
                     </p>
-                    <p className="text-gray-700 text-base">
-                      {value.status}
-                    </p>
+                    <p className="text-gray-700 text-base">{value.status}</p>
                     <button
                       className="text-center pl-5 block w-full select-none rounded-lg bg-pink-500 py-3 font-sans text-sm font-bold uppercase text-white shadow-md shadow-pink-500/20 transition-all hover:shadow-lg hover:shadow-pink-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                       type="button"
