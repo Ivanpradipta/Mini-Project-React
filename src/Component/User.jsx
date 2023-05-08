@@ -52,7 +52,7 @@ function User() {
         image,
         userId: getAuth().currentUser.uid,
       });
-      alert("berhasil memasukan produk");
+      alert("Berhasil Masukan Produk Ke Cart");
     } catch (error) {
       console.error(error);
       alert("salah");
@@ -204,7 +204,7 @@ function User() {
                     <p className="text-gray-700 text-base font-bold">
                       {value.description}
                     </p>
-                    <p className="text-gray-700 text-base">{value.status}</p>
+                    <p className="text-gray-700 text-base font-bold">Status: {value.status}</p>
                     <button
                       className="text-center pl-5 block w-full select-none rounded-lg bg-pink-500 py-3 font-sans text-sm font-bold uppercase text-white shadow-md shadow-pink-500/20 transition-all hover:shadow-lg hover:shadow-pink-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                       type="button"

@@ -15,16 +15,10 @@ function LoginPage() {
     event.preventDefault();
     if (username == "admin") {
       const dummyUser = { username: "admin", password: "admin" };
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (user && user.username === username && user.password === password) {
-        localStorage.setItem("isLoggedIn", true);
-        navigate("/admin");
-      } else if (
+      if (
         username === dummyUser.username &&
         password === dummyUser.password
       ) {
-        localStorage.setItem("user", JSON.stringify(dummyUser));
-        localStorage.setItem("isLoggedIn", true);
         navigate("/admin");
       }
     } else {
@@ -33,7 +27,6 @@ function LoginPage() {
           const user = userCredential.user;
           console.log(user);
           navigate("/user");
-          alert("berhasil masuk");
         })
         .catch(() => {
           alert("email/password salah ");
