@@ -100,16 +100,16 @@ function Cart() {
                               {value.name}
                             </span>
                             <span className="text-xl font-light text-black-400">
-                              aojakdnajnsakjsnakn
+                              {value.description}
+                            </span>
+                          </div>
                               <button
-                                className="bg-blue-200 text-black active:bg-blue-500 font-bold px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ml-[30rem]"
+                                className="bg-blue-200 text-black active:bg-blue-500 font-bold px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ml-[40rem]"
                                 type="button"
                                 onClick={() => handleDelete(value.id)}
                               >
                                 Delete
                               </button>
-                            </span>
-                          </div>
                         </div>
                         <div className="relative float-right"></div>
                       </div>
