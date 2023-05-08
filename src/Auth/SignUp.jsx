@@ -21,6 +21,7 @@ const Register = () => {
     } catch (err) {
       console.log(err);
     }
+    alert("berhasil daftar")
   };
 
   return (
