@@ -7,6 +7,7 @@ import Register from './Auth/SignUp';
 import History from './Component/History'
 import ProtectedRoute from './Routes/ProtectedRoute';
 import LandingPage from './Component/LandingPage';
+import Detail from './Component/Detail';
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <Route path="/user" element={<ProtectedRoute component={User}/>} />
         <Route path="/cart" element={<ProtectedRoute component={Cart}/>} />
         <Route path="/history" element={<History/>} />
+        <Route path="/detail" element={<Detail/>} />
         
 
       </Routes>
