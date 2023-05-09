@@ -38,11 +38,7 @@ function User() {
       console.error(error);
     }
   };
-  useEffect(() => {
-
-    getProducts();
-  }, []);
-
+  
   const handleOnClick = async (id, name, description, image) => {
     try {
       await addDoc(cartCollectionRef, {
@@ -71,11 +67,15 @@ function User() {
       }
       return 0;
     });
-
+    
     setProductList(sortedList);
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
+  useEffect(() => {
 
+    getProducts();
+  }, []);
+  
   return (
     <>
       <aside
