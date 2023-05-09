@@ -2,11 +2,9 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { auth } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
 import HeaderAdmin from "../Header/HeaderSignup";
 
 const Register = () => {
-  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -69,8 +67,8 @@ const Register = () => {
                   />
                   {errors.password && (
                     <p className="text-red-700">
-                      {" "}
-                      {errors?.password?.message}{" "}
+                      
+                      {errors?.password?.message}
                     </p>
                   )}
                 </div>
