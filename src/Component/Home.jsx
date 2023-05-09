@@ -34,6 +34,7 @@ function Home() {
   const [sortOrder, setSortOrder] = useState("asc");
   const productsCollectionRef = collection(db, "products");
 
+  // get product
   const getProducts = async () => {
     try {
       const data = await getDocs(productsCollectionRef);
@@ -46,20 +47,17 @@ function Home() {
       console.error(error);
     }
   };
-
+// delete data
   const handleDelete = async (id) => {
     
       const productDoc = doc(db, "products", id);
       await deleteDoc(productDoc);
 
-      const updatedProducts = productList.filter(
-        (product) => product.id !== id
-      );
-      setProductList(updatedProducts);
       getProducts();
     
   };
 
+  // update data
   const handleUpdate = async (id) => {
     const filesFolderRef = ref(storage, `products/${productImage.name}`);
 
@@ -79,7 +77,6 @@ function Home() {
       const productDoc = doc(db, "products", id);
       await updateDoc(productDoc, product);
       alert("berhasil update data");
-      console.log(product)
       getProducts();
     } catch (error) {
       console.error(error);
@@ -107,7 +104,7 @@ function Home() {
       };
 
       await addDoc(productsCollectionRef, product);
-      setProductList([...productList, product]);
+      
       setGetLink(getLink);
       alert("berhasil tambah data");
     } catch (error) {

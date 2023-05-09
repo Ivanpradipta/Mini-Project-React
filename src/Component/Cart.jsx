@@ -31,51 +31,46 @@ function Cartt() {
     where("userId", "==", `${getAuth()?.currentUser?.uid}`)
   );
 
-  useEffect(() => {
-    const getProducts = async () => {
-      try {
-        const data = await getDocs(productQuery);
-        const filterData = data.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        setProductCart(filterData);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getProducts();
-  }, []);
-
+  const getProducts = async () => {
+    try {
+      const data = await getDocs(productQuery);
+      const filterData = data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setProductCart(filterData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
   const handleDelete = async (id) => {
     
       const productDoc = doc(db, "cart", id);
       await deleteDoc(productDoc);
-
-      const updatedProducts = productCart.filter(
-        (product) => product.id !== id
-      );
-      setProductCart(updatedProducts);
-    
-  };
-
-  const handleOnClick = async () => {
-    const user = {
-      name: userName,
-      nim: userNim,
-      pinjam: dateStart,
-      balik: dateEnd,
+      
+      getProducts();
     };
-    await addDoc(userCollectionRef, user);
-    setUserList([...userList, user]);
-    alert("berhasil reserve");
-
-    setUserName("");
-    setDateStart("");
-    setDateEnd("");
-    setUserNim("");
-  };
-
+    
+    const handleOnClick = async () => {
+      const user = {
+        name: userName,
+        nim: userNim,
+        pinjam: dateStart,
+        balik: dateEnd,
+      };
+      await addDoc(userCollectionRef, user);
+      alert("berhasil reserve");
+      getProducts();
+      setUserName("");
+      setDateStart("");
+      setDateEnd("");
+      setUserNim("");
+    };
+    useEffect(() => {
+      getProducts();
+    }, []);
+  
   return (
     <>
       <HeaderCart />
