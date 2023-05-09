@@ -323,7 +323,7 @@ function Home() {
                               }
                             />
                             <label
-                              className="mt-px inline-block pl-[0.15rem] hover:cursor-pointer"
+                              className="mt-px inline-block pl-[0.15rem] hover:cursor-pointer "
                               htmlFor="radioDefault01"
                             >
                               Ready
@@ -409,7 +409,7 @@ function Home() {
                             maxLength={10}
                           />
                           <label className="block text-black text-sm font-bold mb-1">
-                            Deskripsi
+                            kategori
                           </label>
                           <input
                             className="shadow appearance-none border rounded w-full py-2 px-1 text-black"
@@ -572,7 +572,7 @@ function Home() {
                       <p className="text-gray-700 font-bold">
                         {value.description}
                       </p>
-                      <p className="text-gray-700 text-base">
+                      <p className="text-gray-700 text-base font-bold">
                         Status : {value.status}
                       </p>
                       <button

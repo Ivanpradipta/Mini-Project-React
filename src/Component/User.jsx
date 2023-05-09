@@ -26,19 +26,19 @@ function User() {
   const productsCollectionRef = collection(db, "products");
   const cartCollectionRef = collection(db, "cart");
 
+  const getProducts = async () => {
+    try {
+      const data = await getDocs(productsCollectionRef);
+      const filterData = data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setProductList(filterData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
-    const getProducts = async () => {
-      try {
-        const data = await getDocs(productsCollectionRef);
-        const filterData = data.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        setProductList(filterData);
-      } catch (error) {
-        console.error(error);
-      }
-    };
 
     getProducts();
   }, []);

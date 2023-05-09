@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { auth } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import HeaderAdmin from "../Header/HeaderSignup";
 
 const Register = () => {
