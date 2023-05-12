@@ -7,29 +7,34 @@ import {
   doc,
   query,
   where,
+  onSnapshot,
+  getDoc,
+
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import React, { useEffect, useRef, useState } from "react";
 import gambar from "../Image/barcode.jpg";
 import HeaderCart from "../Header/HeaderCart";
+import dayjs from "dayjs";
 
-function Cartt() {
+function Cart() {
   const [productCart, setProductCart] = useState([]);
-  const [userList, setUserList] = useState([]);
+  const [Data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showBarcode, setShowBarcode] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [userNim, setUserNim] = useState("");
-  const [dateStart, setDateStart] = useState("");
-  const [dateEnd, setDateEnd] = useState("");
+  const [dateStart, setDateStart] = useState(dayjs());
+  const [dateEnd, setDateEnd] = useState(dayjs());
   const [productId, setProductId] = useState("");
   const userCollectionRef = collection(db, "users");
   const cartCollectionRef = collection(db, "cart");
+  const dataCollectionRef = collection(db, "data");
   const productQuery = query(
     cartCollectionRef,
     where("userId", "==", `${getAuth()?.currentUser?.uid}`)
   );
+
 
   const getProducts = async () => {
     try {
@@ -43,34 +48,40 @@ function Cartt() {
       console.error(error);
     }
   };
+
+  const getDataUser = () => {
+    onSnapshot(doc(db, "data", `${getAuth().currentUser.uid}`), (doc) => {
+      setData(doc.data());
+      console.log(doc.data())
+      console.log(getAuth().currentUser.uid)
+    });
+  }
   
   const handleDelete = async (id) => {
-    
-      const productDoc = doc(db, "cart", id);
-      await deleteDoc(productDoc);
-      
-      getProducts();
+    const productDoc = doc(db, "cart", id);
+    await deleteDoc(productDoc);
+
+    getProducts();
+  };
+
+  const handleOnClick = async () => {
+    const user = {
+      name: Data.name,
+      nim: Data.nim,
+      pinjam: dayjs(dateStart, "DD-MM-YYYY").format("DD-MM-YYYY"),
+      balik: dayjs(dateEnd, "DD-MM-YYYY").format("DD-MM-YYYY"),
+      userId: getAuth().currentUser.uid,
     };
-    
-    const handleOnClick = async () => {
-      const user = {
-        name: userName,
-        nim: userNim,
-        pinjam: dateStart,
-        balik: dateEnd,
-      };
-      await addDoc(userCollectionRef, user);
-      alert("berhasil reserve");
-      getProducts();
-      setUserName("");
-      setDateStart("");
-      setDateEnd("");
-      setUserNim("");
-    };
-    useEffect(() => {
-      getProducts();
-    }, []);
-  
+    await addDoc(userCollectionRef, user);
+    getProducts();
+    setDateStart(dayjs().format("DD-MM-YYYY"));
+    setDateEnd(dayjs().format("DD-MM-YYYY"));
+  };
+  useEffect(() => {
+    getDataUser();
+    getProducts();
+  }, []);
+
   return (
     <>
       <HeaderCart />
@@ -101,6 +112,12 @@ function Cartt() {
                     </th>
                     <th
                       scope="col"
+                      className="px-[3rem] py-3 text-xs font-bold text-left text-gray-500 uppercase "
+                    >
+                      Total
+                    </th>
+                    <th
+                      scope="col"
                       className="px-[4.8rem] py-3 text-xs font-bold text-right text-gray-500 uppercase"
                     >
                       Action
@@ -108,76 +125,95 @@ function Cartt() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                {showModalDelete ? (
-              <>
-                
-                    <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-                      <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                        <button
-                          type="button"
-                          className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
-                          data-modal-hide="popup-modal"
-                          onClick={() => setShowModalDelete(false)}
-
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span className="sr-only">Close modal</span>
-
-                        </button>
-                        <div className="p-6 text-center">
-                          <svg
-                            aria-hidden="true"
-                            className="mx-auto mb-4 text-gray-400 w-14 h-14 dark:text-gray-200"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                            Are you sure you want to delete this product?
-                          </h3>
+                  {showModalDelete ? (
+                    <>
+                      <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                           <button
-                            data-modal-hide="popup-modal"
                             type="button"
-                            onClick={() => {handleDelete(productId); setShowModalDelete(false)}}
-                            className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
-                          >
-                            Yes, I'm sure
-                          </button>
-                          <button
+                            className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
                             data-modal-hide="popup-modal"
-                            type="button"
                             onClick={() => setShowModalDelete(false)}
-                            className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
                           >
-                            No, cancel
+                            <svg
+                              aria-hidden="true"
+                              className="w-5 h-5"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            <span className="sr-only">Close modal</span>
                           </button>
+                          <div className="p-6 text-center">
+                            <svg
+                              aria-hidden="true"
+                              className="mx-auto mb-4 text-gray-400 w-14 h-14 dark:text-gray-200"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                              Are you sure you want to delete this product?
+                            </h3>
+                            <button
+                              data-modal-hide="popup-modal"
+                              type="button"
+                              onClick={() => {
+                                handleDelete(productId);
+                                setShowModalDelete(false);
+                              }}
+                              className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
+                            >
+                              Yes, I'm sure
+                            </button>
+                            <button
+                              data-modal-hide="popup-modal"
+                              type="button"
+                              onClick={() => setShowModalDelete(false)}
+                              className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                            >
+                              No, cancel
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  
-                
-              </>
-            ) : null}
+                    </>
+                  ) : null}
+                  {showNotif ? (
+                    <>
+                      <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                          <div className="p-6 text-center">
+                            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                              Successfully checkout item
+                            </h3>
+                            <button
+                              data-modal-hide="popup-modal"
+                              type="button"
+                              onClick={() => setShowNotif(false)}
+                              className="text-gray-500 bg-blue-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                            >
+                              OK
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : null}
                   {productCart.map((value) => (
                     <tr>
                       <td className="px-12 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
@@ -193,13 +229,18 @@ function Cartt() {
                       <td className="px-12 py-4 text-sm text-gray-800 whitespace-nowrap">
                         {value.description}
                       </td>
+                      <td className="px-12 py-4 text-sm text-gray-800 whitespace-nowrap">
+                        {value.stock}
+                      </td>
                       <td className="px-12 py-4 text-sm font-medium text-right whitespace-nowrap">
                         <button
                           className="bg-red-500 text-white active:bg-blue-500 
       font-bold px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
                           type="button"
-                          onClick={()=>{setShowModalDelete(true);setProductId(value.id)}}
-
+                          onClick={() => {
+                            setShowModalDelete(true);
+                            setProductId(value.id);
+                          }}
                         >
                           Delete
                         </button>
@@ -230,23 +271,22 @@ function Cartt() {
                                 </label>
                                 <input
                                   className="shadow appearance-none border rounded w-full py-2 px-1 text-black pr-[150px]"
-                                  value={userName}
-                                  onChange={(event) =>
-                                    setUserName(event.target.value)
-                                  }
+                                  value={Data.name}
+                                  
+                                  disabled
+                                  
                                 />
                                 <label className="block text-black text-sm font-bold mb-1 ">
                                   NIM
                                 </label>
                                 <input
                                   className="shadow appearance-none border rounded w-full py-2 px-1 text-black"
-                                  value={userNim}
-                                  onChange={(event) =>
-                                    setUserNim(event.target.value)
-                                  }
+                                  value={Data.nim}
+                                  disabled
+                                  
                                 />
                                 <label className="block text-black text-sm font-bold mb-1">
-                                  Tanggal Pinjam
+                                  Date Start
                                 </label>
                                 <div className="relative max-w-sm">
                                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -268,14 +308,14 @@ function Cartt() {
                                     datepicker=""
                                     type="date"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    value={dateStart}
+                                    value={dateStart.format("YYYY-MM-DD")}
                                     onChange={(event) =>
-                                      setDateStart(event.target.value)
+                                      setDateStart(dayjs(event.target.value))
                                     }
                                   />
                                 </div>
                                 <label className="block text-black text-sm font-bold mb-1">
-                                  Tanggal kembali
+                                  Date End
                                 </label>
                                 <div className="relative max-w-sm">
                                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -297,9 +337,9 @@ function Cartt() {
                                     datepicker=""
                                     type="date"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    value={dateEnd}
+                                    value={dateEnd.format("YYYY-MM-DD")}
                                     onChange={(event) =>
-                                      setDateEnd(event.target.value)
+                                      setDateEnd(dayjs(event.target.value))
                                     }
                                   />
                                 </div>
@@ -313,6 +353,7 @@ function Cartt() {
                                   setShowModal(false);
                                   handleOnClick();
                                   setShowBarcode(true);
+                                  setShowNotif(true);
                                 }}
                               >
                                 Submit
@@ -370,4 +411,4 @@ function Cartt() {
   );
 }
 
-export default Cartt;
+export default Cart;

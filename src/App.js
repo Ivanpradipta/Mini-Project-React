@@ -8,6 +8,8 @@ import History from './Component/History'
 import ProtectedRoute from './Routes/ProtectedRoute';
 import LandingPage from './Component/LandingPage';
 import Detail from './Component/Detail';
+import DetailUser from './Component/DetailUser';
+import HistoryUser from './Component/HistoryUser';
 
 
 function App() {
@@ -24,7 +26,9 @@ function App() {
         <Route path="/user" element={<ProtectedRoute component={User}/>} />
         <Route path="/cart" element={<ProtectedRoute component={Cart}/>} />
         <Route path="/history" element={<History/>} />
+        <Route path="/historyuser" element={<HistoryUser/>} />
         <Route path="/detail" element={<Detail/>} />
+        <Route path="/detailuser" element={<DetailUser/>} />
         
 
       </Routes>

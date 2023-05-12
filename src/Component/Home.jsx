@@ -11,7 +11,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, getStorage } from "firebase/storage";
-import back from "../Image/back.png";
 import blm from "../Image/download.png";
 import logout from "../Image/logout.png";
 import history from "../Image/history.png";
@@ -26,12 +25,16 @@ function Home() {
   const [productDescription, setProductDescription] = useState("");
   const [productImage, setProductImage] = useState();
   const [productStatus, setProductStatus] = useState("");
+  const [productStock, setProductStock] = useState("");
   const [productList, setProductList] = useState([]);
   const [productId, setProductId] = useState("");
   const [filteredList, setFilteredList] = useState(productList);
   const [getLink, setGetLink] = useState("");
-  const formRef = useRef(null);
+  const [showNotifDelete, setshowNotifDelete] = useState(false);
+  const [showModalNotif, setShowModalNotif] = useState(false);
+  const [showNotifEdit, setShowNotifEdit] = useState(false);
   const [sortOrder, setSortOrder] = useState("asc");
+  const formRef = useRef(null);
   const productsCollectionRef = collection(db, "products");
 
   // get product
@@ -47,14 +50,12 @@ function Home() {
       console.error(error);
     }
   };
-// delete data
-  const handleDelete = async (id) => {
-    
-      const productDoc = doc(db, "products", id);
-      await deleteDoc(productDoc);
 
-      getProducts();
-    
+  // delete data
+  const handleDelete = async (id) => {
+    const productDoc = doc(db, "products", id);
+    await deleteDoc(productDoc);
+    getProducts();
   };
 
   // update data
@@ -71,12 +72,12 @@ function Home() {
         name: productName,
         description: productDescription,
         status: productStatus,
-        image : getLink
+        stock: productStock,
+        image: getLink,
       };
       setGetLink(getLink);
       const productDoc = doc(db, "products", id);
       await updateDoc(productDoc, product);
-      alert("berhasil update data");
       getProducts();
     } catch (error) {
       console.error(error);
@@ -84,6 +85,7 @@ function Home() {
     setProductName("");
     setProductDescription("");
     setProductStatus("");
+    setProductStock("");
 
     formRef.current.reset();
   };
@@ -100,20 +102,21 @@ function Home() {
         name: productName,
         description: productDescription,
         status: productStatus,
+        stock: productStock,
         image: getLink,
       };
 
       await addDoc(productsCollectionRef, product);
-      
+
       setGetLink(getLink);
-      alert("berhasil tambah data");
     } catch (error) {
       console.error(error);
     }
-    getProducts()
+    getProducts();
     setProductName("");
     setProductDescription("");
     setProductStatus("");
+    setProductStock("");
 
     formRef.current.reset();
   };
@@ -265,7 +268,7 @@ function Home() {
           <div className="justify-between my-1">
             <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
               <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">
-                LIST BARANG
+                LIST ITEM
               </span>
             </h1>
 
@@ -299,6 +302,7 @@ function Home() {
                             }
                             maxLength={10}
                           />
+
                           <label className="block text-black text-sm font-bold mb-1">
                             Kategori
                           </label>
@@ -309,6 +313,17 @@ function Home() {
                               setProductDescription(event.target.value)
                             }
                             maxLength={10}
+                          />
+                          <label className="block text-black text-sm font-bold mb-1">
+                            Stock
+                          </label>
+                          <input
+                            type="number"
+                            className="shadow appearance-none border rounded w-full py-2 px-1 text-black"
+                            value={productStock}
+                            onChange={(event) =>
+                              setProductStock(event.target.value)
+                            }
                           />
                           <label className="block text-black text-sm font-bold mb-1">
                             Status
@@ -371,7 +386,11 @@ function Home() {
                         <button
                           className="text-white bg-blue-500 active:bg-yellow-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
                           type="button"
-                          onClick={handleonClick}
+                          onClick={() => {
+                            handleonClick();
+                            setShowModalNotif(true);
+                            setShowModalAdd(false);
+                          }}
                         >
                           Submit
                         </button>
@@ -410,7 +429,7 @@ function Home() {
                               setProductName(event.target.value)
                             }
                             maxLength={10}
-                          />
+                            />
                           <label className="block text-black text-sm font-bold mb-1">
                             kategori
                           </label>
@@ -421,6 +440,17 @@ function Home() {
                               setProductDescription(event.target.value)
                             }
                             maxLength={15}
+                            />
+                          <label className="block text-black text-sm font-bold mb-1">
+                            Stock
+                          </label>
+                          <input
+                            type="number"
+                            className="shadow appearance-none border rounded w-full py-2 px-1 text-black"
+                            value={productStock}
+                            onChange={(event) =>
+                              setProductStock(event.target.value)
+                            }
                           />
                           <label className="block text-black text-sm font-bold mb-1">
                             Status
@@ -436,11 +466,11 @@ function Home() {
                               onChange={(event) =>
                                 setProductStatus(event.target.value)
                               }
-                            />
+                              />
                             <label
                               className="mt-px inline-block pl-[0.15rem] hover:cursor-pointer"
                               htmlFor="radioDefault01"
-                            >
+                              >
                               Ready
                             </label>
                           </div>
@@ -455,18 +485,18 @@ function Home() {
                               onChange={(event) =>
                                 setProductStatus(event.target.value)
                               }
-                            />
+                              />
                             <label
                               className="mt-px inline-block pl-[0.15rem] hover:cursor-pointer"
                               htmlFor="radioDefault02"
-                            >
+                              >
                               Reserved
                             </label>
                           </div>
                           <label
                             htmlFor="formFile"
                             className="mb-2 inline-block text-neutral-700 dark:text-neutral-200"
-                          >
+                            >
                             Upload Gambar
                           </label>
                           <input
@@ -483,8 +513,8 @@ function Home() {
                         <button
                           className="text-white bg-blue-500 active:bg-yellow-700 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1"
                           type="button"
-                          onClick={() => handleUpdate(productId)}
-                        >
+                          onClick={() => {handleUpdate(productId);setShowModalEdit(false); setShowNotifEdit(true)}}
+                          >
                           Submit
                         </button>
                       </div>
@@ -495,77 +525,140 @@ function Home() {
             ) : null}
             {showModalDelete ? (
               <>
-                
-                    <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-                      <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                        <button
-                          type="button"
-                          className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
-                          data-modal-hide="popup-modal"
-                          onClick={() => setShowModalDelete(false)}
-
+                <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                  <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <button
+                      type="button"
+                      className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+                      data-modal-hide="popup-modal"
+                      onClick={() => setShowModalDelete(false)}
+                    >
+                      <svg
+                        aria-hidden="true"
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
                         >
-                          <svg
-                            aria-hidden="true"
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span className="sr-only">Close modal</span>
-
-                        </button>
-                        <div className="p-6 text-center">
-                          <svg
-                            aria-hidden="true"
-                            className="mx-auto mb-4 text-gray-400 w-14 h-14 dark:text-gray-200"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                            Are you sure you want to delete this product?
-                          </h3>
-                          <button
-                            data-modal-hide="popup-modal"
-                            type="button"
-                            onClick={() => {handleDelete(productId); setShowModalDelete(false)}}
-                            className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
-                          >
-                            Yes, I'm sure
-                          </button>
-                          <button
-                            data-modal-hide="popup-modal"
-                            type="button"
-                            onClick={() => setShowModalDelete(false)}
-                            className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                          >
-                            No, cancel
-                          </button>
-                        </div>
-                      </div>
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="sr-only">Close modal</span>
+                    </button>
+                    <div className="p-6 text-center">
+                      <svg
+                        aria-hidden="true"
+                        className="mx-auto mb-4 text-gray-400 w-14 h-14 dark:text-gray-200"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                      </svg>
+                      <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                        Are you sure you want to delete this product?
+                      </h3>
+                      <button
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        onClick={() => {
+                          handleDelete(productId);
+                          setShowModalDelete(false);
+                          setshowNotifDelete(true)
+                        }}
+                        className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
+                      >
+                        Yes, I'm sure
+                      </button>
+                      <button
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        onClick={() => setShowModalDelete(false)}
+                        className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                        >
+                        No, cancel
+                      </button>
                     </div>
-                  
-                
+                  </div>
+                </div>
               </>
             ) : null}
           </div>
         </div>
         <div>
+            {showModalNotif ? (
+              <>
+                <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                  <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <div className="p-6 text-center">
+                      <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                        Successfully Added Item 
+                      
+                      </h3>
+                      <button
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        onClick={() => setShowModalNotif(false)}
+                        className="text-gray-500 bg-blue-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                      >
+                        OK
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : null}
+            {showNotifDelete ? (
+              <>
+                <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                  <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <div className="p-6 text-center">
+                      <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                        Successfully Delete Item
+                      </h3>
+                      <button
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        onClick={() => setshowNotifDelete(false)}
+                        className="text-gray-500 bg-blue-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                      >
+                        OK
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : null}
+            {showNotifEdit ? (
+              <>
+                <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                  <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <div className="p-6 text-center">
+                      <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                        Successfully Edit Item
+                      </h3>
+                      <button
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        onClick={() => setShowNotifEdit(false)}
+                        className="text-gray-500 bg-blue-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                      >
+                        OK
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : null}
           <div className="col-10 ml-3">
             {productList
               .filter(
@@ -589,6 +682,10 @@ function Home() {
                       <p className="text-gray-700 font-bold">
                         {value.description}
                       </p>
+                      <p className="text-gray-700 font-bold">
+                        Stock : {value.stock}
+                      </p>
+
                       <p className="text-gray-700 text-base font-bold">
                         Status : {value.status}
                       </p>
@@ -608,7 +705,10 @@ function Home() {
                         className="block w-full select-none rounded-lg bg-red-500 py-3 px-7 text-center align-middle font-sans text-sm font-bold uppercase text-white shadow-md shadow-pink-500/20 transition-all hover:shadow-lg hover:shadow-pink-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                         type="button"
                         data-ripple-light="true"
-                        onClick={()=>{setShowModalDelete(true);setProductId(value.id)}}
+                        onClick={() => {
+                          setShowModalDelete(true);
+                          setProductId(value.id);
+                        }}
                       >
                         Delete
                       </button>
