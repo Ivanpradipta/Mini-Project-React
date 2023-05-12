@@ -5,24 +5,21 @@ import {
   getDocs,
   collection,
   addDoc,
-  deleteDoc,
-  doc,
-  updateDoc,
-  query,
-  where,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import back from "../Image/back.png";
 import logo from "../Image/logo.png";
 import blm from "../Image/download.png";
 import logout from "../Image/logout.png";
 import gambar from "../Image/cart.png";
+import History from "../Image/history.png";
 import { Link } from "react-router-dom";
 
 function User() {
   const [productList, setProductList] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
   const [filteredList, setFilteredList] = useState(productList);
+  const [showModal, setShowModal] = useState(false);
+
   const productsCollectionRef = collection(db, "products");
   const cartCollectionRef = collection(db, "cart");
 
@@ -39,20 +36,21 @@ function User() {
     }
   };
   
-  const handleOnClick = async (id, name, description, image) => {
+  const handleOnClick = async (id, name, description,stock ,image) => {
     try {
       await addDoc(cartCollectionRef, {
         id,
         name,
         description,
+        stock,
         image,
         userId: getAuth().currentUser.uid,
       });
-      alert("Berhasil Masukan Produk Ke Cart");
     } catch (error) {
       console.error(error);
       alert("salah");
     }
+    
   };
 
   const handleSort = () => {
@@ -71,6 +69,8 @@ function User() {
     setProductList(sortedList);
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
+
+
   useEffect(() => {
 
     getProducts();
@@ -141,7 +141,6 @@ function User() {
               <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={handleSort}
               >
                 <img
                   src={gambar}
@@ -156,6 +155,22 @@ function User() {
             <li>
               <a
                 href="#"
+                className="flex items-center p-1 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <img
+                  src={History}
+                  alt=""
+                  className="flex-shrink-0 w-8 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "
+                />
+
+                <Link to="/historyuser" className="flex-1 ml-2 whitespace-nowrap">
+                  History
+                </Link>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <img
@@ -164,7 +179,7 @@ function User() {
                   className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white pl-1"
                 />
 
-                <Link to="/login" className="flex-1 ml-3 whitespace-nowrap">
+                <Link to="/login" className="flex-1 ml-3 whitespace-nowrap ">
                   Logout
                 </Link>
               </a>
@@ -178,11 +193,34 @@ function User() {
         <div className=" justify-between my-1 text-center">
           <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
             <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">
-              LIST BARANG
+              LIST ITEM
             </span>
           </h1>
         </div>
         <div>
+        {showModal ? (
+          <>
+            <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                      <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                        <div className="p-6 text-center"> 
+                          <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                            Successfully Added Item to Cart
+                          </h3>
+                          <button
+                            data-modal-hide="popup-modal"
+                            type="button"
+                            onClick={() => setShowModal(false)}
+                            className="text-gray-500 bg-blue-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                          >
+                           OK
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+            
+          </>
+        ) : null}
+      
           <div className="col-10 m-auto">
             {productList.filter(
                 (value) =>
@@ -204,6 +242,9 @@ function User() {
                     <p className="text-gray-700 text-base font-bold">
                       {value.description}
                     </p>
+                    <p className="text-gray-700 text-base font-bold">
+                      Stock : {value.stock}
+                    </p>
                     <p className="text-gray-700 text-base font-bold">Status: {value.status}</p>
                     <button
                       className="text-center pl-5 block w-full select-none rounded-lg bg-pink-500 py-3 font-sans text-sm font-bold uppercase text-white shadow-md shadow-pink-500/20 transition-all hover:shadow-lg hover:shadow-pink-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
@@ -211,12 +252,15 @@ function User() {
                       data-ripple-light="true"
                       disabled={value.status == "Reserved" ? true : false}
                       onClick={() =>
-                        handleOnClick(
+                        {handleOnClick(
                           value.id,
                           value.name,
                           value.description,
+                          value.stock,
                           value.image
-                        )
+                        );
+                        setShowModal(true)
+                        }
                       }
                     >
                       add to cart        

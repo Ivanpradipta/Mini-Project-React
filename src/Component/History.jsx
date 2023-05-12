@@ -1,29 +1,42 @@
 import { useState } from "react";
 import { db } from "../firebase";
 import { useEffect } from "react";
-import { getDocs, collection, deleteDoc, doc } from "firebase/firestore";
+import { getDocs, collection, deleteDoc, doc ,onSnapshot, query,
+  where,} from "firebase/firestore";
 import { Link } from "react-router-dom";
+import { getAuth } from "firebase/auth";
+
 import HeaderHistory from "../Header/HeaderHistory";
 
 function History() {
   const [userHistory, setUserHistory] = useState([]);
+  const [Data, setData] = useState([]);
   const [productId, setProductId] = useState("");
   const [showModalDelete, setShowModalDelete] = useState(false);
   const historyCollectionref = collection(db, "users");
+  const dataCollectionref = collection(db, "data");
+  const dataQuery = query(
+    dataCollectionref,
+    where("nim", "==", `${getAuth()?.currentUser?.uid}`)
+  );
+
+  const getUsers = async () => {
+    try {
+      const data = await getDocs(historyCollectionref);
+      const filterData = data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setUserHistory(filterData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+
+ 
 
   useEffect(() => {
-    const getUsers = async () => {
-      try {
-        const data = await getDocs(historyCollectionref);
-        const filterData = data.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        setUserHistory(filterData);
-      } catch (error) {
-        console.error(error);
-      }
-    };
     getUsers();
   }, []);
 

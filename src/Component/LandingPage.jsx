@@ -169,14 +169,10 @@ function LandingPage() {
               About <span className="text-blue-600">Us</span>
             </h1>
             <p className="mt-4">
-              Kami adalah sebuah perusahaan yang bergerak di bidang teknologi
-              dan berkomitmen untuk memberikan solusi terbaik bagi para
-              pelanggan kami.
+            We are a company engaged in technology and are committed to providing the best solutions for our customers.
             </p>
             <p className="mt-4">
-              Kami memiliki tim yang terdiri dari para ahli di bidangnya
-              masing-masing dan berpengalaman dalam mengerjakan proyek-proyek
-              besar.
+            We have a team consisting of experts in their respective fields and experienced in working on large projects.
             </p>
           </div>
           <div className="md:w-1/2 px-4">
@@ -196,9 +192,7 @@ function LandingPage() {
               <span className="text-blue-600">Contact</span> Us
             </h1>
             <p className="mt-4 text-center">
-              Silakan menghubungi kami melalui formulir di bawah ini atau
-              melalui informasi kontak yang tersedia di bagian bawah halaman
-              ini.
+            Please contact us via the form below or via the contact information provided at the bottom of this page.
             </p>
             <form className="mt-8">
               <div className="mb-4">
@@ -206,13 +200,13 @@ function LandingPage() {
                   className="block text-gray-700 font-bold mb-2"
                   htmlFor="name"
                 >
-                  Nama
+                  Name
                 </label>
                 <input
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   id="name"
                   type="text"
-                  placeholder="Masukkan nama Anda"
+                  placeholder="Ivan Pradipta"
                 />
               </div>
               <div className="mb-4">
@@ -226,7 +220,7 @@ function LandingPage() {
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   id="email"
                   type="email"
-                  placeholder="Masukkan email Anda"
+                  placeholder="ivan@mail.com"
                 />
               </div>
               <div className="mb-4">
@@ -234,12 +228,12 @@ function LandingPage() {
                   className="block text-gray-700 font-bold mb-2"
                   htmlFor="message"
                 >
-                  Pesan
+                  Message
                 </label>
                 <textarea
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
                   id="message"
-                  placeholder="Tuliskan pesan Anda"
+                  placeholder="lorem ipsum"
                 ></textarea>
               </div>
               <div className="flex items-center justify-center">
@@ -247,7 +241,7 @@ function LandingPage() {
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                   type="button"
                 >
-                  Kirim
+                  Submit 
                 </button>
               </div>
             </form>

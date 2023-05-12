@@ -10,10 +10,10 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import React, { useEffect, useRef, useState } from "react";
-import HeaderDetail from "../Header/HeaderDetail";
+import HeaderDetailUser from "../Header/HeaderDetailUser";
 
 
-function Detail() {
+function DetailUser() {
   const [productCart, setProductCart] = useState([]);
 
   const cartCollectionRef = collection(db, "cart");
@@ -22,29 +22,25 @@ function Detail() {
     where("userId", "==", `${getAuth()?.currentUser?.uid}`)
   );
 
-  const getProducts = async () => {
-    try {
-      const data = await getDocs(productQuery);
-      const filterData = data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      setProductCart(filterData);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
- 
-
   useEffect(() => {
-    
+    const getProducts = async () => {
+      try {
+        const data = await getDocs(productQuery);
+        const filterData = data.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setProductCart(filterData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
     getProducts();
   }, []);
   return (
 
     <>
-    <HeaderDetail/>
+    <HeaderDetailUser/>
       <div className="flex flex-col items-center">
         <div className="overflow-x-auto">
           <div className=" p-7 inline-block align-middle">
@@ -100,4 +96,4 @@ function Detail() {
   );
 }
 
-export default Detail;
+export default DetailUser;
