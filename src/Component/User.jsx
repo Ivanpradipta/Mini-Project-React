@@ -22,7 +22,7 @@ function User() {
 
   const productsCollectionRef = collection(db, "products");
   const cartCollectionRef = collection(db, "cart");
-
+  
   const getProducts = async () => {
     try {
       const data = await getDocs(productsCollectionRef);
@@ -38,7 +38,7 @@ function User() {
   
   const handleOnClick = async (id, name, description,stock ,image) => {
     try {
-      await addDoc(cartCollectionRef, {
+      await addDoc(cartCollectionRef ,{
         id,
         name,
         description,
@@ -46,6 +46,7 @@ function User() {
         image,
         userId: getAuth().currentUser.uid,
       });
+      setShowModal(true)
     } catch (error) {
       console.error(error);
       alert("salah");
@@ -259,7 +260,6 @@ function User() {
                           value.stock,
                           value.image
                         );
-                        setShowModal(true)
                         }
                       }
                     >

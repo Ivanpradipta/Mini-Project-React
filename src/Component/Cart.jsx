@@ -71,6 +71,7 @@ function Cart() {
       pinjam: dayjs(dateStart, "DD-MM-YYYY").format("DD-MM-YYYY"),
       balik: dayjs(dateEnd, "DD-MM-YYYY").format("DD-MM-YYYY"),
       userId: getAuth().currentUser.uid,
+    
     };
     await addDoc(userCollectionRef, user);
     getProducts();

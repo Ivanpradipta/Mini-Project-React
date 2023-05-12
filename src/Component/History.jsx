@@ -14,11 +14,7 @@ function History() {
   const [productId, setProductId] = useState("");
   const [showModalDelete, setShowModalDelete] = useState(false);
   const historyCollectionref = collection(db, "users");
-  const dataCollectionref = collection(db, "data");
-  const dataQuery = query(
-    dataCollectionref,
-    where("nim", "==", `${getAuth()?.currentUser?.uid}`)
-  );
+  
 
   const getUsers = async () => {
     try {
@@ -33,8 +29,6 @@ function History() {
     }
   };
   
-
- 
 
   useEffect(() => {
     getUsers();
